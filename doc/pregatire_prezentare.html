@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CinemaVerse – Pregătire prezentare</title>
+<style>
+:root{--bg:#fff;--fg:#1c2230;--mut:#5b6478;--line:#d9dee8;--acc:#b3123a;--acc2:#2d4a8a;--card:#f6f8fb;--code:#eef1f7}
+@media (prefers-color-scheme:dark){:root{--bg:#12151c;--fg:#e6e9f0;--mut:#9aa3b8;--line:#2b3244;--acc:#ff5c85;--acc2:#8fb0ff;--card:#1a1f2a;--code:#222938}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,Segoe UI,sans-serif}
+main{max-width:900px;margin:0 auto;padding:24px 16px 60px}
+h1{margin:0 0 4px}h2{margin:40px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--acc)}h3{color:var(--acc2);margin:22px 0 4px}
+.sub{color:var(--mut);margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:12px 0}
+code{background:var(--code);padding:1px 5px;border-radius:4px;font-family:Consolas,monospace;font-size:.9em}
+pre{background:var(--code);padding:12px;border-radius:6px;overflow:auto;font-size:.85rem;margin:8px 0}
+pre code{padding:0;background:none}
+ol li,ul li{margin:6px 0}
+label{cursor:pointer;display:block;margin:6px 0}
+details{border:1px solid var(--line);border-radius:6px;padding:8px 14px;margin:8px 0;background:var(--card)}
+summary{cursor:pointer;font-weight:600}
+.t{color:var(--acc);font-weight:700}
+.warn{border-left:4px solid var(--acc);padding-left:12px}
+</style></head><body><main>
+<h1>CinemaVerse – ghid de rulare și pregătire</h1>
+<p class="sub">Predare etapa 1 – 1 decembrie · bifează pașii pe măsură ce îi faci</p>
+
+<h2>A. Rularea proiectului, pas cu pas</h2>
+<div class="card">
+<label><input type="checkbox"> 1. Deschide <b>SQL Server Management Studio</b> și conectează-te: Server <code>localhost</code> (sau numele tău de server), Authentication <b>Windows Authentication</b>.</label>
+<label><input type="checkbox"> 2. <b>File → Open → File…</b> și deschide <code>01_create_database.sql</code> din <code>D:\FACULTATE\AN 4\ABD\PROIECT\</code>. Apasă <b>F5</b> (Execute). La final vezi lista indecșilor.</label>
+<label><input type="checkbox"> 3. La fel cu <code>02_seed_data.sql</code> → F5. Vezi tabelul cu numărul de rânduri (4, 8, 10, 8, 24, 12, 8, 18, 10, 8).</label>
+<label><input type="checkbox"> 4. La fel cu <code>03_views.sql</code> → F5. Se afișează conținutul celor 6 vederi.</label>
+<label><input type="checkbox"> 5. La fel cu <code>04_security.sql</code> → F5. Se afișează rolurile, drepturile și testele <code>EXECUTE AS</code> (3 mesaje de tip „permission was denied”, e normal – sunt testele).</label>
+<label><input type="checkbox"> 6. În <b>Object Explorer</b> dă Refresh pe <b>Databases → CinemaVerse</b>: ar trebui să vezi 10 tabele, 6 vederi și (la Security → Users/Roles) utilizatorii și rolurile.</label>
+</div>
+<p class="warn"><b>Atenție:</b> <code>01</code> șterge și recreează baza <code>CinemaVerse</code>. Dacă o rulezi după ce ai introdus date proprii, le pierzi. Dacă SSMS spune că baza e folosită, închide celelalte ferestre de query către ea (scriptul face deja SINGLE_USER, dar fereastra ta trebuie să fie pe <code>master</code>).</p>
+<p>Dacă ceva dă eroare, citește numărul liniei din mesaj; cel mai des cauza e rularea scripturilor în altă ordine.</p>
+
+<h3>Diagrama din SSMS (pentru capturi)</h3>
+<ol>
+<li>Object Explorer → CinemaVerse → <b>Database Diagrams</b> → click dreapta → <b>New Database Diagram</b> (acceptă „Yes” dacă cere să instaleze suportul pentru diagrame).</li>
+<li>Selectează toate cele 10 tabele → Add → Close. Aranjează-le (click dreapta → Arrange Selection) și fă captură de ecran.</li>
+<li>Salvează diagrama ca <code>CinemaVerse_diagram</code>. Poți pune captura în documentație lângă diagrama SVG deja existentă.</li>
+</ol>
+
+<h3>Opțional: conectare cu utilizatorii creați</h3>
+<p>Ca să te conectezi efectiv ca <code>cv_cashier</code>, serverul trebuie să accepte „SQL Server and Windows Authentication mode” (click dreapta pe server → Properties → Security → apoi restart serviciu). Nu e obligatoriu: testele <code>EXECUTE AS</code> din <code>04_security.sql</code> arată același lucru. Parolele sunt în script (ex.: <code>Cashier#2026!cv</code>).</p>
+
+<h3>Documentația</h3>
+<p>Deschide <code>documentatie.html</code> cu dublu click (în Chrome/Edge). Pentru PDF: Ctrl+P → „Save as PDF”.</p>
+
+<h2>B. Ce să ai pregătit înainte de prezentare</h2>
+<div class="card">
+<label><input type="checkbox"> Baza de date rulată proaspăt (pașii 1–5 făcuți în aceeași zi) și SSMS deschis cu scripturile în file separate.</label>
+<label><input type="checkbox"> <code>documentatie.html</code> deschisă într-o fereastră de browser.</label>
+<label><input type="checkbox"> Diagrama bazei de date deschisă (SVG din documentație sau diagrama din SSMS).</label>
+<label><input type="checkbox"> Poți explica pe scurt fiecare tabel și de ce există (vezi secțiunea D).</label>
+<label><input type="checkbox"> Ai încercat măcar o dată toate demonstrațiile din secțiunea C.</label>
+<label><input type="checkbox"> Ai trimis/încărcat fișierele cerute (scripturile + documentația) – verifică cum cere profa.</label>
+</div>
+
+<h2>C. Planul prezentării (aprox. 10 minute)</h2>
+<p>Cerința pentru 1 decembrie: <b>specificații, structura bazei de date, constrângeri, vederi, tipuri de utilizatori și roluri, drepturi</b>. Exact în ordinea asta:</p>
+
+<h3><span class="t">1.</span> Specificații și cazuri de utilizare (1–2 min)</h3>
+<p>Arată secțiunile 1–2 din documentație. Spune: „Platformă de cinema inspirată de Cinema City: catalog de filme, program pe săli, vânzare de bilete pe loc, conturi de clienți, recenzii, angajați. Cinci tipuri de utilizatori: client, casier, manager, analist, administrator.”</p>
+
+<h3><span class="t">2.</span> Structura bazei de date (3 min)</h3>
+<p>Arată diagrama. Punctează:</p>
+<ul>
+<li><b>10 tabele.</b> Relații <b>1-n</b>: Cinemas→Halls, Halls→Screenings, Screenings→Tickets etc.</li>
+<li><b>m-n</b>: Movies↔Genres (prin <code>MovieGenres</code>) și Customers↔Movies (prin <code>Reviews</code>, care are atribute proprii: notă, comentariu).</li>
+<li><b>Recursivă</b>: <code>Employees.manager_id</code> → director → manager → casier.</li>
+</ul>
+<p>Demo în SSMS (rulează separat):</p>
+<pre><code>SELECT * FROM Halls;                 -- capacity e coloana calculata
+SELECT * FROM MovieGenres;           -- tabela asociativa m-n
+SELECT * FROM vw_EmployeeHierarchy ORDER BY path;   -- ierarhia recursiva</code></pre>
+
+<h3><span class="t">3.</span> Constrângeri și indecși (2 min)</h3>
+<p>Arată 2–3 constrângeri care <b>chiar se declanșează</b>. Execută fiecare și arată eroarea:</p>
+<pre><code>USE CinemaVerse;
+-- loc vandut de doua ori (UNIQUE pe screening_id, seat_row, seat_number)
+INSERT INTO Tickets (screening_id, customer_id, seat_row, seat_number, price_paid)
+VALUES (1, 2, 5, 10, 45);
+
+-- rating invalid (CHECK 1..10)
+INSERT INTO Reviews (customer_id, movie_id, rating) VALUES (8, 1, 11);
+
+-- angajat propriul manager (CHECK)
+UPDATE Employees SET manager_id = employee_id WHERE employee_id = 3;
+
+-- stergere film cu proiectii (FK fara CASCADE)
+DELETE FROM Movies WHERE movie_id = 1;
+
+-- CASCADE vs SET NULL: stergi un client, biletele raman cu customer_id NULL
+BEGIN TRAN;
+DELETE FROM Customers WHERE customer_id = 1;
+SELECT ticket_id, customer_id FROM Tickets WHERE ticket_id IN (1,2);
+ROLLBACK;</code></pre>
+<p>La indecși: „PK = clustered, UNIQUE creează indecși unici, plus index non-clustered cu INCLUDE pe program, index filtrat pe bilete cu cont și index unic filtrat pe telefon (permite mai mulți NULL).”</p>
+
+<h3><span class="t">4.</span> Vederi (1–2 min)</h3>
+<pre><code>SELECT * FROM vw_UpcomingScreenings ORDER BY start_time;   -- locuri libere
+SELECT * FROM vw_MovieCatalog;                              -- genuri + nota medie
+SELECT * FROM vw_Revenue ORDER BY revenue DESC;</code></pre>
+<p>Spune ce problemă rezolvă fiecare (program pentru public, raportare pentru analist, ierarhie fără salarii, profil client fără date personale).</p>
+
+<h3><span class="t">5.</span> Utilizatori, roluri, drepturi (2–3 min)</h3>
+<p>Arată matricea din secțiunea 7 a documentației, apoi demonstrează:</p>
+<pre><code>EXECUTE AS USER = 'cv_cashier';
+SELECT TOP 3 title, free_seats FROM vw_UpcomingScreenings;   -- merge
+SELECT salary FROM Employees;                                -- DENY
+REVERT;
+
+EXECUTE AS USER = 'cv_analyst';
+SELECT * FROM vw_Revenue;                                    -- merge
+DELETE FROM Tickets;                                         -- DENY
+REVERT;
+
+EXECUTE AS USER = 'cv_manager';
+SELECT * FROM vw_EmployeeHierarchy;                          -- merge (fara salarii)
+SELECT salary FROM Employees;                                -- DENY
+REVERT;</code></pre>
+<p>Mesaj-cheie: „Drepturile sunt date rolurilor, nu utilizatorilor; am aplicat privilegiul minim. Salariile și datele personale se văd doar prin vederi sau coloane permise.”</p>
+
+<h2>D. Întrebări probabile și răspunsuri</h2>
+<details><summary>De ce ai ales ierarhia recursivă pe Employees?</summary>Un cinema are director → manageri → casieri/operatori. Un singur tabel cu <code>manager_id</code> reprezintă orice adâncime; o parcurg cu CTE recursiv în <code>vw_EmployeeHierarchy</code>.</details>
+<details><summary>Cum garantezi că un loc nu se vinde de două ori?</summary>Constrângerea <code>UNIQUE (screening_id, seat_row, seat_number)</code> pe Tickets. Chiar dacă două persoane cumpără simultan, a doua primește eroare de cheie duplicat.</details>
+<details><summary>Cum verifici că locul există în sală (rând/loc ≤ dimensiunea sălii)?</summary>Un CHECK nu poate compara cu alt tabel, deci această regulă o fac cu un trigger DML la etapa următoare (e menționat în documentație).</details>
+<details><summary>Ce diferență e între clustered și non-clustered?</summary>Clustered ordonează fizic datele tabelei după cheie – un singur index clustered pe tabel (PK-ul meu). Non-clustered e o structură separată cu pointer către rânduri; pot fi mai multe.</details>
+<details><summary>Ce e un index filtrat? De ce îl folosești?</summary>Index doar pe rândurile care îndeplinesc o condiție (<code>WHERE customer_id IS NOT NULL</code>). E mai mic și permite unicitate doar pentru valori existente (telefon).</details>
+<details><summary>De ce ON DELETE SET NULL la Tickets.customer_id, dar CASCADE la Reviews?</summary>Biletele sunt date financiare/istorice (încasări) și trebuie păstrate chiar dacă clientul își șterge contul; recenziile fără autor nu au sens, deci se șterg odată cu clientul.</details>
+<details><summary>De ce roluri și nu drepturi direct pe utilizatori?</summary>Se administrează mai ușor: un casier nou se adaugă în <code>role_cashier</code> și primește automat drepturile. Se reduce riscul de erori.</details>
+<details><summary>De ce managerul poate vedea vw_EmployeeHierarchy dacă are DENY pe Employees?</summary>Ownership chaining: vedere și tabel au același proprietar (dbo), deci SQL Server nu mai verifică drepturile pe tabelul de bază când accesul se face prin vedere. Vederea nu include salariul, deci expune doar ce e permis.</details>
+<details><summary>Ce face coloana capacity din Halls?</summary>Coloană calculată persistată: <code>seat_rows × seats_per_row</code>. Se actualizează automat și o folosesc la calculul locurilor libere.</details>
+<details><summary>Ce urmează pentru prezentarea finală?</summary>Proceduri stocate CRUD, funcții T-SQL, triggere DML și DDL, cursoare, job-uri și strategia de backup/restore.</details>
+
+<h2>E. Dacă ceva nu merge</h2>
+<ul>
+<li><b>„Cannot drop database because it is currently in use”</b>: deschide un query nou pe <code>master</code>, rulează <code>ALTER DATABASE CinemaVerse SET SINGLE_USER WITH ROLLBACK IMMEDIATE;</code> apoi rulează din nou <code>01</code>.</li>
+<li><b>„Invalid object name”</b>: ai rulat un script în altă bază; pune <code>USE CinemaVerse;</code> sus sau alege baza din dropdown.</li>
+<li><b>Proiecțiile nu apar în vw_UpcomingScreenings</b>: vederea arată doar proiecții viitoare, iar datele de test sunt generate la ziua rulării. Reîncarcă baza rulând din nou <code>01</code> și <code>02</code>.</li>
+<li><b>Eroare la CREATE LOGIN</b>: rulează <code>04_security.sql</code> cu un cont care e sysadmin (Windows Authentication, ca administrator).</li>
+</ul>
+</main></body></html>
