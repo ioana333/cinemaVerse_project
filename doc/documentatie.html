@@ -1,0 +1,223 @@
+<!doctype html><html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CinemaVerse – Documentație proiect ABD</title><style>
+:root{--bg:#fff;--fg:#1c2230;--mut:#5b6478;--line:#d9dee8;--acc:#b3123a;--acc2:#2d4a8a;--card:#f6f8fb;--code:#eef1f7;--tb:#fff;--th:#e9edf5}
+@media (prefers-color-scheme:dark){:root{--bg:#12151c;--fg:#e6e9f0;--mut:#9aa3b8;--line:#2b3244;--acc:#ff5c85;--acc2:#8fb0ff;--card:#1a1f2a;--code:#222938;--tb:#161a23;--th:#212839}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,Segoe UI,Roboto,sans-serif}
+header{padding:48px 16px 28px;background:linear-gradient(135deg,#6b0f2a,#1f2a52);color:#fff}
+header .in,main{max-width:1100px;margin:0 auto;padding:0 16px}header h1{margin:0 0 6px;font-size:2rem}header p{margin:2px 0;opacity:.9}
+nav{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+nav .in{max-width:1100px;margin:0 auto;padding:8px 16px;display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.9rem}
+nav a{color:var(--acc2);text-decoration:none}nav a:hover{text-decoration:underline}
+h2{margin:44px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--acc);font-size:1.5rem}h3{margin:28px 0 4px;font-size:1.1rem;color:var(--acc2)}
+code,pre{background:var(--code);border-radius:4px;font-family:Consolas,monospace;font-size:.88em}code{padding:1px 5px}pre{padding:12px;overflow:auto}
+.tw{overflow-x:auto;margin:8px 0 14px}table{border-collapse:collapse;width:100%;background:var(--tb);font-size:.92rem}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-align:top}th{background:var(--th)}
+.mx td{text-align:center}.mx td:first-child{text-align:left}.ok{color:#1b8a4b;font-weight:600}.no{color:#c62828;font-weight:700}.none{color:var(--mut)}.all{color:var(--acc2);font-weight:600}
+.note{color:var(--mut);font-size:.85rem}.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:12px 0}
+.diagram{width:100%;height:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;font-family:system-ui,sans-serif}
+.tbl{fill:var(--tb);stroke:var(--acc2);stroke-width:1.3}.thd{fill:var(--acc2)}.ttl{fill:#fff;font-size:13px;font-weight:700}
+.col,.pk,.fk{font-size:11.5px;fill:var(--fg)}.pk{font-weight:700;fill:var(--acc)}.fk{font-style:italic;fill:var(--acc2)}.ty{font-size:10px;fill:var(--mut)}
+.rel{fill:none;stroke:var(--mut);stroke-width:1.5}.card{font-size:12px}svg .card{fill:var(--acc);font-weight:700;background:none;border:0}svg .note{fill:var(--mut);font-size:11px}
+.sys{fill:none;stroke:var(--mut);stroke-width:1.5;stroke-dasharray:6 4}.ttl2{fill:var(--fg);font-size:15px;font-weight:700}.uc{fill:var(--tb);stroke:var(--acc2);stroke-width:1.4}
+.uct{fill:var(--fg);font-size:11.5px}.act{stroke:var(--fg);fill:none;stroke-width:2}.aname{fill:var(--fg);font-size:13px;font-weight:700}.ul{stroke:var(--mut);stroke-width:1}
+ul.sp{padding-left:20px}footer{margin:48px 0 24px;color:var(--mut);font-size:.85rem;text-align:center}
+@media print{nav{display:none}header{background:#fff;color:#000}h2{break-after:avoid}.tw,svg{break-inside:avoid}}
+</style></head><body>
+<header><div class="in"><h1>CinemaVerse – platformă de cinema</h1>
+<p>Proiect Administrarea Bazelor de Date · Microsoft SQL Server (Transact-SQL)</p><p>Student: Paucean Ioana · Predare etapa 1: 1 decembrie 2026</p></div></header>
+<nav><div class="in"><a href="#spec">1. Specificații</a><a href="#uc">2. Cazuri de utilizare</a><a href="#db">3. Structura bazei de date</a><a href="#constr">4. Constrângeri</a><a href="#idx">5. Indecși</a><a href="#views">6. Vederi</a><a href="#sec">7. Utilizatori și drepturi</a><a href="#run">8. Rulare</a><a href="#next">9. Etapa următoare</a></div></nav>
+<main>
+<h2 id="spec">1. Specificații</h2>
+<p><b>Domeniul aplicativ:</b> rețea de cinematografe cu platformă online (inspirată de Cinema City): catalog de filme, program de proiecții pe cinematograf/sală, vânzare și rezervare de bilete pe loc, conturi de clienți cu puncte de loialitate, recenzii și gestiunea angajaților.</p>
+<div class="card"><b>Funcționalități acoperite de baza de date</b><ul class="sp">
+<li>Gestiunea rețelei: cinematografe → săli (tip STANDARD / VIP / IMAX / 4DX / 3D, capacitate calculată).</li>
+<li>Catalogul de filme, cu genuri multiple per film (many-to-many).</li>
+<li>Programarea proiecțiilor, fără suprapuneri în aceeași sală.</li>
+<li>Vânzarea biletelor pe loc (rând + număr) pe canale ONLINE / APP / BOX_OFFICE, cu stări RESERVED / PAID / CANCELLED / USED; imposibilitatea vânzării duble a unui loc.</li>
+<li>Conturi de clienți, istoric de achiziții și recenzii (o recenzie / client / film).</li>
+<li>Angajați cu ierarhie managerială (relație recursivă) și salarii protejate prin drepturi.</li>
+<li>Raportare: încasări, grad de ocupare, note medii.</li></ul></div>
+<p><b>Cerințe ale proiectului îndeplinite în această etapă:</b> 10 tabele; relații 1-n, m-n (MovieGenres, Reviews) și recursivă (Employees); constrângeri; indecși unique și clustered; vederi; utilizatori, roluri și drepturi. Restul elementelor (proceduri CRUD, funcții, triggere DML/DDL, cursoare, job-uri, backup/restore) sunt planificate pentru prezentarea finală (secțiunea 9).</p>
+
+<h2 id="uc">2. Diagrama cazurilor de utilizare</h2>
+<svg viewBox="0 0 900 860" class="diagram" role="img" aria-label="Diagrama cazurilor de utilizare">
+<rect x="250" y="20" width="400" height="810" rx="10" class="sys"/><text x="450" y="46" class="ttl2" text-anchor="middle">Platforma CinemaVerse</text>
+<line x1="126" y1="242" x2="300" y2="85" class="ul"/>
+<line x1="126" y1="242" x2="300" y2="165" class="ul"/>
+<line x1="126" y1="242" x2="300" y2="245" class="ul"/>
+<line x1="126" y1="242" x2="300" y2="405" class="ul"/>
+<line x1="126" y1="242" x2="300" y2="485" class="ul"/>
+<line x1="126" y1="552" x2="300" y2="85" class="ul"/>
+<line x1="126" y1="552" x2="300" y2="165" class="ul"/>
+<line x1="126" y1="552" x2="300" y2="245" class="ul"/>
+<line x1="126" y1="552" x2="300" y2="325" class="ul"/>
+<line x1="774" y1="192" x2="600" y2="85" class="ul"/>
+<line x1="774" y1="192" x2="600" y2="325" class="ul"/>
+<line x1="774" y1="192" x2="600" y2="565" class="ul"/>
+<line x1="774" y1="192" x2="600" y2="645" class="ul"/>
+<line x1="774" y1="192" x2="600" y2="725" class="ul"/>
+<line x1="774" y1="412" x2="600" y2="85" class="ul"/>
+<line x1="774" y1="412" x2="600" y2="725" class="ul"/>
+<line x1="774" y1="682" x2="600" y2="805" class="ul"/>
+<ellipse cx="450" cy="85" rx="150" ry="26" class="uc"/><text x="450" y="89" text-anchor="middle" class="uct">1. Consultă programul și catalogul</text>
+<ellipse cx="450" cy="165" rx="150" ry="26" class="uc"/><text x="450" y="169" text-anchor="middle" class="uct">2. Creează cont de client</text>
+<ellipse cx="450" cy="245" rx="150" ry="26" class="uc"/><text x="450" y="249" text-anchor="middle" class="uct">3. Cumpără / rezervă bilet</text>
+<ellipse cx="450" cy="325" rx="150" ry="26" class="uc"/><text x="450" y="329" text-anchor="middle" class="uct">4. Anulează bilet</text>
+<ellipse cx="450" cy="405" rx="150" ry="26" class="uc"/><text x="450" y="409" text-anchor="middle" class="uct">5. Scrie recenzie</text>
+<ellipse cx="450" cy="485" rx="150" ry="26" class="uc"/><text x="450" y="489" text-anchor="middle" class="uct">6. Vizualizează istoricul biletelor</text>
+<ellipse cx="450" cy="565" rx="150" ry="26" class="uc"/><text x="450" y="569" text-anchor="middle" class="uct">7. Gestionează filme și proiecții</text>
+<ellipse cx="450" cy="645" rx="150" ry="26" class="uc"/><text x="450" y="649" text-anchor="middle" class="uct">8. Vizualizează ierarhia angajaților</text>
+<ellipse cx="450" cy="725" rx="150" ry="26" class="uc"/><text x="450" y="729" text-anchor="middle" class="uct">9. Consultă rapoarte de încasări</text>
+<ellipse cx="450" cy="805" rx="150" ry="26" class="uc"/><text x="450" y="809" text-anchor="middle" class="uct">10. Administrează BD, utilizatori, backup</text>
+<g><circle cx="110" cy="224" r="9" class="act"/><line x1="110" y1="233" x2="110" y2="260" class="act"/><line x1="94" y1="242" x2="126" y2="242" class="act"/><line x1="110" y1="260" x2="97" y2="280" class="act"/><line x1="110" y1="260" x2="123" y2="280" class="act"/><text x="110" y="298" text-anchor="middle" class="aname">Client</text><text x="110" y="312" text-anchor="middle" class="note">(aplicație web / mobil)</text></g>
+<g><circle cx="110" cy="534" r="9" class="act"/><line x1="110" y1="543" x2="110" y2="570" class="act"/><line x1="94" y1="552" x2="126" y2="552" class="act"/><line x1="110" y1="570" x2="97" y2="590" class="act"/><line x1="110" y1="570" x2="123" y2="590" class="act"/><text x="110" y="608" text-anchor="middle" class="aname">Casier</text><text x="110" y="622" text-anchor="middle" class="note">(la casă)</text></g>
+<g><circle cx="790" cy="174" r="9" class="act"/><line x1="790" y1="183" x2="790" y2="210" class="act"/><line x1="774" y1="192" x2="806" y2="192" class="act"/><line x1="790" y1="210" x2="777" y2="230" class="act"/><line x1="790" y1="210" x2="803" y2="230" class="act"/><text x="790" y="248" text-anchor="middle" class="aname">Manager</text><text x="790" y="262" text-anchor="middle" class="note">(cinema)</text></g>
+<g><circle cx="790" cy="394" r="9" class="act"/><line x1="790" y1="403" x2="790" y2="430" class="act"/><line x1="774" y1="412" x2="806" y2="412" class="act"/><line x1="790" y1="430" x2="777" y2="450" class="act"/><line x1="790" y1="430" x2="803" y2="450" class="act"/><text x="790" y="468" text-anchor="middle" class="aname">Analist</text><text x="790" y="482" text-anchor="middle" class="note">(rapoarte)</text></g>
+<g><circle cx="790" cy="664" r="9" class="act"/><line x1="790" y1="673" x2="790" y2="700" class="act"/><line x1="774" y1="682" x2="806" y2="682" class="act"/><line x1="790" y1="700" x2="777" y2="720" class="act"/><line x1="790" y1="700" x2="803" y2="720" class="act"/><text x="790" y="738" text-anchor="middle" class="aname">Administrator</text><text x="790" y="752" text-anchor="middle" class="note">(DBA)</text></g>
+</svg>
+<p class="note">Actorii corespund rolurilor din baza de date (secțiunea 7): Client = role_customer, Casier = role_cashier, Manager = role_manager, Analist = role_analyst, Administrator = role_admin.</p>
+
+<h2 id="db">3. Structura bazei de date</h2>
+<h3>Diagrama bazei de date</h3>
+<svg viewBox="0 0 1040 740" class="diagram" role="img" aria-label="Diagrama bazei de date CinemaVerse">
+<polyline points="230,97.0 290,129.0" class="rel"/><text x="236" y="91.0" class="card">1</text><text x="276" y="123.0" class="card">N</text>
+<polyline points="130.0,154 130.0,290" class="rel"/><text x="136.0" y="170" class="card">1</text><text x="136.0" y="282" class="card">N</text>
+<polyline points="230,363.0 290,363.0" class="rel"/><text x="236" y="357.0" class="card">1</text><text x="276" y="357.0" class="card">N</text>
+<polyline points="490,363.0 550,379.0" class="rel"/><text x="496" y="357.0" class="card">1</text><text x="536" y="373.0" class="card">N</text>
+<polyline points="810,371.0 750,379.0" class="rel"/><text x="796" y="365.0" class="card">1</text><text x="756" y="373.0" class="card">N</text>
+<polyline points="650.0,560 650.0,500 390.0,500 390.0,436" class="rel"/><text x="656.0" y="552" class="card">1</text><text x="396.0" y="452" class="card">N</text>
+<polyline points="490,593.0 550,641.0" class="rel"/><text x="496" y="587.0" class="card">N</text><text x="536" y="635.0" class="card">1</text>
+<polyline points="230,593.0 290,593.0" class="rel"/><text x="236" y="587.0" class="card">1</text><text x="276" y="587.0" class="card">N</text>
+<polyline points="750,641.0 810,617.0" class="rel"/><text x="756" y="635.0" class="card">1</text><text x="796" y="611.0" class="card">N</text>
+<polyline points="910.0,452 910.0,560" class="rel"/><text x="916.0" y="468" class="card">1</text><text x="916.0" y="552" class="card">N</text>
+<polyline points="490,80 524,80 524,188 490,188" class="rel"/><text x="496" y="74" class="card">1</text><text x="496" y="182" class="card">N</text><text x="532" y="134.0" class="note">manager_id</text><text x="532" y="148.0" class="note">(recursivă)</text>
+<text x="30" y="725" class="note">1 = părinte, N = copil. Tabelele MovieGenres și Reviews rezolvă relațiile many-to-many.</text>
+<g><rect x="30" y="40" width="200" height="114" rx="4" class="tbl"/><rect x="30" y="40" width="200" height="26" rx="4" class="thd"/><text x="130.0" y="57" class="ttl" text-anchor="middle">Cinemas</text><text x="38" y="80" class="pk">PK cinema_id</text><text x="222" y="80" class="ty" text-anchor="end">INT</text><text x="38" y="96" class="col">name</text><text x="222" y="96" class="ty" text-anchor="end">NVARCHAR(60)</text><text x="38" y="112" class="col">city</text><text x="222" y="112" class="ty" text-anchor="end">NVARCHAR(50)</text><text x="38" y="128" class="col">address</text><text x="222" y="128" class="ty" text-anchor="end">NVARCHAR(120)</text><text x="38" y="144" class="col">phone</text><text x="222" y="144" class="ty" text-anchor="end">VARCHAR(15)</text></g>
+<g><rect x="30" y="290" width="200" height="146" rx="4" class="tbl"/><rect x="30" y="290" width="200" height="26" rx="4" class="thd"/><text x="130.0" y="307" class="ttl" text-anchor="middle">Halls</text><text x="38" y="330" class="pk">PK hall_id</text><text x="222" y="330" class="ty" text-anchor="end">INT</text><text x="38" y="346" class="fk">FK cinema_id</text><text x="222" y="346" class="ty" text-anchor="end">INT</text><text x="38" y="362" class="col">name</text><text x="222" y="362" class="ty" text-anchor="end">NVARCHAR(30)</text><text x="38" y="378" class="col">hall_type</text><text x="222" y="378" class="ty" text-anchor="end">VARCHAR(10)</text><text x="38" y="394" class="col">seat_rows</text><text x="222" y="394" class="ty" text-anchor="end">TINYINT</text><text x="38" y="410" class="col">seats_per_row</text><text x="222" y="410" class="ty" text-anchor="end">TINYINT</text><text x="38" y="426" class="col">capacity</text><text x="222" y="426" class="ty" text-anchor="end">calculată</text></g>
+<g><rect x="550" y="560" width="200" height="162" rx="4" class="tbl"/><rect x="550" y="560" width="200" height="26" rx="4" class="thd"/><text x="650.0" y="577" class="ttl" text-anchor="middle">Movies</text><text x="558" y="600" class="pk">PK movie_id</text><text x="742" y="600" class="ty" text-anchor="end">INT</text><text x="558" y="616" class="col">title</text><text x="742" y="616" class="ty" text-anchor="end">NVARCHAR(100)</text><text x="558" y="632" class="col">description</text><text x="742" y="632" class="ty" text-anchor="end">NVARCHAR(500)</text><text x="558" y="648" class="col">duration_min</text><text x="742" y="648" class="ty" text-anchor="end">SMALLINT</text><text x="558" y="664" class="col">release_date</text><text x="742" y="664" class="ty" text-anchor="end">DATE</text><text x="558" y="680" class="col">age_rating</text><text x="742" y="680" class="ty" text-anchor="end">VARCHAR(5)</text><text x="558" y="696" class="col">director</text><text x="742" y="696" class="ty" text-anchor="end">NVARCHAR(80)</text><text x="558" y="712" class="col">imdb_rating</text><text x="742" y="712" class="ty" text-anchor="end">DECIMAL(3,1)</text></g>
+<g><rect x="30" y="560" width="200" height="66" rx="4" class="tbl"/><rect x="30" y="560" width="200" height="26" rx="4" class="thd"/><text x="130.0" y="577" class="ttl" text-anchor="middle">Genres</text><text x="38" y="600" class="pk">PK genre_id</text><text x="222" y="600" class="ty" text-anchor="end">INT</text><text x="38" y="616" class="col">name</text><text x="222" y="616" class="ty" text-anchor="end">NVARCHAR(40)</text></g>
+<g><rect x="290" y="560" width="200" height="66" rx="4" class="tbl"/><rect x="290" y="560" width="200" height="26" rx="4" class="thd"/><text x="390.0" y="577" class="ttl" text-anchor="middle">MovieGenres</text><text x="298" y="600" class="pk">PK movie_id</text><text x="482" y="600" class="ty" text-anchor="end">INT</text><text x="298" y="616" class="pk">PK genre_id</text><text x="482" y="616" class="ty" text-anchor="end">INT</text></g>
+<g><rect x="290" y="290" width="200" height="146" rx="4" class="tbl"/><rect x="290" y="290" width="200" height="26" rx="4" class="thd"/><text x="390.0" y="307" class="ttl" text-anchor="middle">Screenings</text><text x="298" y="330" class="pk">PK screening_id</text><text x="482" y="330" class="ty" text-anchor="end">INT</text><text x="298" y="346" class="fk">FK movie_id</text><text x="482" y="346" class="ty" text-anchor="end">INT</text><text x="298" y="362" class="fk">FK hall_id</text><text x="482" y="362" class="ty" text-anchor="end">INT</text><text x="298" y="378" class="col">start_time</text><text x="482" y="378" class="ty" text-anchor="end">DATETIME2(0)</text><text x="298" y="394" class="col">price</text><text x="482" y="394" class="ty" text-anchor="end">DECIMAL(6,2)</text><text x="298" y="410" class="col">audio_lang</text><text x="482" y="410" class="ty" text-anchor="end">VARCHAR(20)</text><text x="298" y="426" class="col">subtitles</text><text x="482" y="426" class="ty" text-anchor="end">VARCHAR(20)</text></g>
+<g><rect x="810" y="290" width="200" height="162" rx="4" class="tbl"/><rect x="810" y="290" width="200" height="26" rx="4" class="thd"/><text x="910.0" y="307" class="ttl" text-anchor="middle">Customers</text><text x="818" y="330" class="pk">PK customer_id</text><text x="1002" y="330" class="ty" text-anchor="end">INT</text><text x="818" y="346" class="col">first_name</text><text x="1002" y="346" class="ty" text-anchor="end">NVARCHAR(50)</text><text x="818" y="362" class="col">last_name</text><text x="1002" y="362" class="ty" text-anchor="end">NVARCHAR(50)</text><text x="818" y="378" class="col">email</text><text x="1002" y="378" class="ty" text-anchor="end">VARCHAR(100)</text><text x="818" y="394" class="col">phone</text><text x="1002" y="394" class="ty" text-anchor="end">VARCHAR(15)</text><text x="818" y="410" class="col">birth_date</text><text x="1002" y="410" class="ty" text-anchor="end">DATE</text><text x="818" y="426" class="col">loyalty_points</text><text x="1002" y="426" class="ty" text-anchor="end">INT</text><text x="818" y="442" class="col">registered_at</text><text x="1002" y="442" class="ty" text-anchor="end">DATETIME2(0)</text></g>
+<g><rect x="550" y="290" width="200" height="178" rx="4" class="tbl"/><rect x="550" y="290" width="200" height="26" rx="4" class="thd"/><text x="650.0" y="307" class="ttl" text-anchor="middle">Tickets</text><text x="558" y="330" class="pk">PK ticket_id</text><text x="742" y="330" class="ty" text-anchor="end">INT</text><text x="558" y="346" class="fk">FK screening_id</text><text x="742" y="346" class="ty" text-anchor="end">INT</text><text x="558" y="362" class="fk">FK customer_id</text><text x="742" y="362" class="ty" text-anchor="end">INT</text><text x="558" y="378" class="col">seat_row</text><text x="742" y="378" class="ty" text-anchor="end">TINYINT</text><text x="558" y="394" class="col">seat_number</text><text x="742" y="394" class="ty" text-anchor="end">TINYINT</text><text x="558" y="410" class="col">price_paid</text><text x="742" y="410" class="ty" text-anchor="end">DECIMAL(6,2)</text><text x="558" y="426" class="col">status</text><text x="742" y="426" class="ty" text-anchor="end">VARCHAR(10)</text><text x="558" y="442" class="col">channel</text><text x="742" y="442" class="ty" text-anchor="end">VARCHAR(10)</text><text x="558" y="458" class="col">purchased_at</text><text x="742" y="458" class="ty" text-anchor="end">DATETIME2(0)</text></g>
+<g><rect x="810" y="560" width="200" height="114" rx="4" class="tbl"/><rect x="810" y="560" width="200" height="26" rx="4" class="thd"/><text x="910.0" y="577" class="ttl" text-anchor="middle">Reviews</text><text x="818" y="600" class="pk">PK customer_id</text><text x="1002" y="600" class="ty" text-anchor="end">INT</text><text x="818" y="616" class="pk">PK movie_id</text><text x="1002" y="616" class="ty" text-anchor="end">INT</text><text x="818" y="632" class="col">rating</text><text x="1002" y="632" class="ty" text-anchor="end">TINYINT</text><text x="818" y="648" class="col">comment</text><text x="1002" y="648" class="ty" text-anchor="end">NVARCHAR(400)</text><text x="818" y="664" class="col">created_at</text><text x="1002" y="664" class="ty" text-anchor="end">DATETIME2(0)</text></g>
+<g><rect x="290" y="40" width="200" height="178" rx="4" class="tbl"/><rect x="290" y="40" width="200" height="26" rx="4" class="thd"/><text x="390.0" y="57" class="ttl" text-anchor="middle">Employees</text><text x="298" y="80" class="pk">PK employee_id</text><text x="482" y="80" class="ty" text-anchor="end">INT</text><text x="298" y="96" class="fk">FK cinema_id</text><text x="482" y="96" class="ty" text-anchor="end">INT</text><text x="298" y="112" class="fk">FK manager_id</text><text x="482" y="112" class="ty" text-anchor="end">INT</text><text x="298" y="128" class="col">first_name</text><text x="482" y="128" class="ty" text-anchor="end">NVARCHAR(50)</text><text x="298" y="144" class="col">last_name</text><text x="482" y="144" class="ty" text-anchor="end">NVARCHAR(50)</text><text x="298" y="160" class="col">position</text><text x="482" y="160" class="ty" text-anchor="end">VARCHAR(20)</text><text x="298" y="176" class="col">salary</text><text x="482" y="176" class="ty" text-anchor="end">DECIMAL(8,2)</text><text x="298" y="192" class="col">hire_date</text><text x="482" y="192" class="ty" text-anchor="end">DATE</text><text x="298" y="208" class="col">email</text><text x="482" y="208" class="ty" text-anchor="end">VARCHAR(100)</text></g>
+</svg>
+<div class="card"><b>Relațiile</b><ul class="sp">
+<li><b>1-n:</b> Cinemas→Halls, Cinemas→Employees, Halls→Screenings, Movies→Screenings, Screenings→Tickets, Customers→Tickets.</li>
+<li><b>m-n:</b> Movies ↔ Genres prin <code>MovieGenres</code> (cheie compusă); Customers ↔ Movies prin <code>Reviews</code> (cu atributele rating, comment, created_at).</li>
+<li><b>Recursivă:</b> Employees.manager_id → Employees.employee_id (director → manager → casier / operator).</li>
+<li>Screenings face legătura între catalog (Movies) și infrastructură (Halls), iar Tickets între proiecții și clienți.</li></ul></div>
+<h3>Descrierea tabelelor</h3>
+<h3 id="t-Cinemas">Cinemas</h3><p>Cinematografele rețelei (un cinema = un mall/locație).</p><div class="tw"><table><thead><tr><th>Coloană</th><th>Tip</th><th>Constrângeri / observații</th></tr></thead><tbody>
+<tr><td><code>cinema_id</code></td><td>INT</td><td>PK, IDENTITY</td></tr>
+<tr><td><code>name</code></td><td>NVARCHAR(60)</td><td>NOT NULL, UNIQUE</td></tr>
+<tr><td><code>city</code></td><td>NVARCHAR(50)</td><td>NOT NULL</td></tr>
+<tr><td><code>address</code></td><td>NVARCHAR(120)</td><td>NOT NULL</td></tr>
+<tr><td><code>phone</code></td><td>VARCHAR(15)</td><td>NULL, CHECK doar cifre/+/spațiu</td></tr>
+</tbody></table></div>
+<h3 id="t-Halls">Halls</h3><p>Sălile unui cinematograf; capacitatea este o coloană calculată din numărul de rânduri și locuri/rând.</p><div class="tw"><table><thead><tr><th>Coloană</th><th>Tip</th><th>Constrângeri / observații</th></tr></thead><tbody>
+<tr><td><code>hall_id</code></td><td>INT</td><td>PK, IDENTITY</td></tr>
+<tr><td><code>cinema_id</code></td><td>INT</td><td>FK → Cinemas, ON DELETE CASCADE</td></tr>
+<tr><td><code>name</code></td><td>NVARCHAR(30)</td><td>NOT NULL, UNIQUE(cinema_id, name)</td></tr>
+<tr><td><code>hall_type</code></td><td>VARCHAR(10)</td><td>DEFAULT &#x27;STANDARD&#x27;, CHECK (STANDARD, VIP, IMAX, 4DX, 3D)</td></tr>
+<tr><td><code>seat_rows</code></td><td>TINYINT</td><td>CHECK 1..30</td></tr>
+<tr><td><code>seats_per_row</code></td><td>TINYINT</td><td>CHECK 1..40</td></tr>
+<tr><td><code>capacity</code></td><td>calculată</td><td>seat_rows × seats_per_row, PERSISTED</td></tr>
+</tbody></table></div>
+<h3 id="t-Movies">Movies</h3><p>Catalogul de filme (durată, clasificare de vârstă, regizor, notă IMDb).</p><div class="tw"><table><thead><tr><th>Coloană</th><th>Tip</th><th>Constrângeri / observații</th></tr></thead><tbody>
+<tr><td><code>movie_id</code></td><td>INT</td><td>PK, IDENTITY</td></tr>
+<tr><td><code>title</code></td><td>NVARCHAR(100)</td><td>NOT NULL, UNIQUE(title, release_date)</td></tr>
+<tr><td><code>description</code></td><td>NVARCHAR(500)</td><td>NULL</td></tr>
+<tr><td><code>duration_min</code></td><td>SMALLINT</td><td>CHECK 1..400</td></tr>
+<tr><td><code>release_date</code></td><td>DATE</td><td>NOT NULL</td></tr>
+<tr><td><code>age_rating</code></td><td>VARCHAR(5)</td><td>DEFAULT &#x27;AG&#x27;, CHECK (AG, AP12, N15, IM18)</td></tr>
+<tr><td><code>director</code></td><td>NVARCHAR(80)</td><td>NULL</td></tr>
+<tr><td><code>imdb_rating</code></td><td>DECIMAL(3,1)</td><td>NULL, CHECK 0..10</td></tr>
+</tbody></table></div>
+<h3 id="t-Genres">Genres</h3><p>Genurile cinematografice.</p><div class="tw"><table><thead><tr><th>Coloană</th><th>Tip</th><th>Constrângeri / observații</th></tr></thead><tbody>
+<tr><td><code>genre_id</code></td><td>INT</td><td>PK, IDENTITY</td></tr>
+<tr><td><code>name</code></td><td>NVARCHAR(40)</td><td>NOT NULL, UNIQUE</td></tr>
+</tbody></table></div>
+<h3 id="t-MovieGenres">MovieGenres</h3><p>Tabelă asociativă pentru relația many-to-many Movies ↔ Genres.</p><div class="tw"><table><thead><tr><th>Coloană</th><th>Tip</th><th>Constrângeri / observații</th></tr></thead><tbody>
+<tr><td><code>movie_id</code></td><td>INT</td><td>PK, FK → Movies, CASCADE</td></tr>
+<tr><td><code>genre_id</code></td><td>INT</td><td>PK, FK → Genres, CASCADE</td></tr>
+</tbody></table></div>
+<h3 id="t-Screenings">Screenings</h3><p>Proiecțiile: un film într-o sală la o anumită oră, cu preț și limbă/subtitrare.</p><div class="tw"><table><thead><tr><th>Coloană</th><th>Tip</th><th>Constrângeri / observații</th></tr></thead><tbody>
+<tr><td><code>screening_id</code></td><td>INT</td><td>PK, IDENTITY</td></tr>
+<tr><td><code>movie_id</code></td><td>INT</td><td>FK → Movies</td></tr>
+<tr><td><code>hall_id</code></td><td>INT</td><td>FK → Halls</td></tr>
+<tr><td><code>start_time</code></td><td>DATETIME2(0)</td><td>NOT NULL, UNIQUE(hall_id, start_time)</td></tr>
+<tr><td><code>price</code></td><td>DECIMAL(6,2)</td><td>CHECK &gt; 0</td></tr>
+<tr><td><code>audio_lang</code></td><td>VARCHAR(20)</td><td>DEFAULT &#x27;original&#x27;</td></tr>
+<tr><td><code>subtitles</code></td><td>VARCHAR(20)</td><td>NULL, DEFAULT &#x27;romana&#x27;</td></tr>
+</tbody></table></div>
+<h3 id="t-Customers">Customers</h3><p>Conturile clienților platformei online/aplicației (puncte de loialitate).</p><div class="tw"><table><thead><tr><th>Coloană</th><th>Tip</th><th>Constrângeri / observații</th></tr></thead><tbody>
+<tr><td><code>customer_id</code></td><td>INT</td><td>PK, IDENTITY</td></tr>
+<tr><td><code>first_name</code></td><td>NVARCHAR(50)</td><td>NOT NULL</td></tr>
+<tr><td><code>last_name</code></td><td>NVARCHAR(50)</td><td>NOT NULL</td></tr>
+<tr><td><code>email</code></td><td>VARCHAR(100)</td><td>NOT NULL, UNIQUE, CHECK format</td></tr>
+<tr><td><code>phone</code></td><td>VARCHAR(15)</td><td>NULL, UNIQUE filtrat</td></tr>
+<tr><td><code>birth_date</code></td><td>DATE</td><td>CHECK 1900..2020</td></tr>
+<tr><td><code>loyalty_points</code></td><td>INT</td><td>DEFAULT 0, CHECK ≥ 0</td></tr>
+<tr><td><code>registered_at</code></td><td>DATETIME2(0)</td><td>DEFAULT SYSDATETIME()</td></tr>
+</tbody></table></div>
+<h3 id="t-Tickets">Tickets</h3><p>Biletele: un rând = un loc la o proiecție. UNIQUE(screening_id, seat_row, seat_number) împiedică vânzarea dublă a unui loc.</p><div class="tw"><table><thead><tr><th>Coloană</th><th>Tip</th><th>Constrângeri / observații</th></tr></thead><tbody>
+<tr><td><code>ticket_id</code></td><td>INT</td><td>PK, IDENTITY</td></tr>
+<tr><td><code>screening_id</code></td><td>INT</td><td>FK → Screenings</td></tr>
+<tr><td><code>customer_id</code></td><td>INT</td><td>NULL, FK → Customers, ON DELETE SET NULL</td></tr>
+<tr><td><code>seat_row</code></td><td>TINYINT</td><td>CHECK &gt; 0</td></tr>
+<tr><td><code>seat_number</code></td><td>TINYINT</td><td>CHECK &gt; 0</td></tr>
+<tr><td><code>price_paid</code></td><td>DECIMAL(6,2)</td><td>CHECK ≥ 0</td></tr>
+<tr><td><code>status</code></td><td>VARCHAR(10)</td><td>DEFAULT &#x27;PAID&#x27;, CHECK (RESERVED, PAID, CANCELLED, USED)</td></tr>
+<tr><td><code>channel</code></td><td>VARCHAR(10)</td><td>DEFAULT &#x27;ONLINE&#x27;, CHECK (ONLINE, BOX_OFFICE, APP)</td></tr>
+<tr><td><code>purchased_at</code></td><td>DATETIME2(0)</td><td>DEFAULT SYSDATETIME()</td></tr>
+</tbody></table></div>
+<h3 id="t-Reviews">Reviews</h3><p>Recenziile clienților: relație many-to-many Customers ↔ Movies cu atribute proprii (notă, comentariu).</p><div class="tw"><table><thead><tr><th>Coloană</th><th>Tip</th><th>Constrângeri / observații</th></tr></thead><tbody>
+<tr><td><code>customer_id</code></td><td>INT</td><td>PK, FK → Customers, CASCADE</td></tr>
+<tr><td><code>movie_id</code></td><td>INT</td><td>PK, FK → Movies, CASCADE</td></tr>
+<tr><td><code>rating</code></td><td>TINYINT</td><td>CHECK 1..10</td></tr>
+<tr><td><code>comment</code></td><td>NVARCHAR(400)</td><td>NULL</td></tr>
+<tr><td><code>created_at</code></td><td>DATETIME2(0)</td><td>DEFAULT SYSDATETIME()</td></tr>
+</tbody></table></div>
+<h3 id="t-Employees">Employees</h3><p>Angajații; manager_id referă același tabel → ierarhie director → manager → casier/operator (relație recursivă).</p><div class="tw"><table><thead><tr><th>Coloană</th><th>Tip</th><th>Constrângeri / observații</th></tr></thead><tbody>
+<tr><td><code>employee_id</code></td><td>INT</td><td>PK, IDENTITY</td></tr>
+<tr><td><code>cinema_id</code></td><td>INT</td><td>FK → Cinemas</td></tr>
+<tr><td><code>manager_id</code></td><td>INT</td><td>NULL, FK → Employees (recursivă)</td></tr>
+<tr><td><code>first_name</code></td><td>NVARCHAR(50)</td><td>NOT NULL</td></tr>
+<tr><td><code>last_name</code></td><td>NVARCHAR(50)</td><td>NOT NULL</td></tr>
+<tr><td><code>position</code></td><td>VARCHAR(20)</td><td>CHECK (DIRECTOR, MANAGER, CASHIER, PROJECTIONIST, CLEANER)</td></tr>
+<tr><td><code>salary</code></td><td>DECIMAL(8,2)</td><td>CHECK ≥ 3700</td></tr>
+<tr><td><code>hire_date</code></td><td>DATE</td><td>NOT NULL</td></tr>
+<tr><td><code>email</code></td><td>VARCHAR(100)</td><td>NOT NULL, UNIQUE</td></tr>
+</tbody></table></div>
+
+<h2 id="constr">4. Constrângeri</h2>
+<div class="tw"><table><thead><tr><th>Tip</th><th>Descriere și locul aplicării</th></tr></thead><tbody><tr><td>Cheie primară</td><td>Toate cele 10 tabele (PK_*). La MovieGenres și Reviews cheia este compusă.</td></tr><tr><td>Cheie externă</td><td>FK_Halls_Cinemas, FK_MovieGenres_*, FK_Screenings_*, FK_Tickets_*, FK_Reviews_*, FK_Employees_* (inclusiv autoreferința FK_Employees_Manager).</td></tr><tr><td>Acțiuni referențiale</td><td>CASCADE: ștergerea unui cinema șterge sălile; a unui film/gen șterge legăturile MovieGenres; a unui client/film șterge recenziile. SET NULL: ștergerea unui client păstrează biletele (customer_id = NULL). Fără acțiune (NO ACTION): nu se poate șterge un film, o sală sau o proiecție care are proiecții/bilete, nici un cinema cu angajați.</td></tr><tr><td>UNIQUE</td><td>Cinemas.name; Halls(cinema_id, name); Movies(title, release_date); Genres.name; Screenings(hall_id, start_time) – o sală nu are două proiecții simultane; Customers.email; Tickets(screening_id, seat_row, seat_number) – un loc nu se vinde de două ori; Employees.email.</td></tr><tr><td>CHECK (domeniu)</td><td>Tipuri sală, clasificări de vârstă (AG/AP12/N15/IM18), durată 1–400 min, notă IMDb 0–10, rating recenzie 1–10, preț &gt; 0, statusuri și canale bilet, salariu ≥ 3700, puncte loialitate ≥ 0, format email, interval data nașterii, format telefon.</td></tr><tr><td>CHECK (logică)</td><td>CK_Employees_NotOwnManager: un angajat nu poate fi propriul manager.</td></tr><tr><td>DEFAULT</td><td>Halls.hall_type='STANDARD'; Movies.age_rating='AG'; Screenings.audio_lang='original', subtitles='romana'; Customers.loyalty_points=0, registered_at=SYSDATETIME(); Tickets.status='PAID', channel='ONLINE', purchased_at=SYSDATETIME(); Reviews.created_at=SYSDATETIME().</td></tr><tr><td>Coloană calculată</td><td>Halls.capacity = seat_rows × seats_per_row (PERSISTED).</td></tr><tr><td>NOT NULL</td><td>Aplicat tuturor atributelor obligatorii; opționale (NULL): phone, description, director, imdb_rating, subtitles, Tickets.customer_id, Reviews.comment, Employees.manager_id.</td></tr></tbody></table></div>
+<p class="note">Reguli care implică mai multe tabele (ex.: locul din bilet să existe în sala proiecției) nu pot fi exprimate prin CHECK și vor fi implementate prin triggere DML în etapa următoare.</p>
+
+<h2 id="idx">5. Indecși</h2>
+<div class="tw"><table><thead><tr><th>Index</th><th>Tip</th><th>Rol</th></tr></thead><tbody><tr><td>PK_* (10)</td><td>CLUSTERED, UNIQUE</td><td>Create automat de PRIMARY KEY pe fiecare tabelă (un singur index clustered / tabelă).</td></tr><tr><td>UQ_* (8)</td><td>NONCLUSTERED, UNIQUE</td><td>Create automat de constrângerile UNIQUE (Cinemas.name, Halls, Movies, Genres, Screenings, Customers.email, Tickets seat, Employees.email).</td></tr><tr><td>IX_Screenings_Start</td><td>NONCLUSTERED + INCLUDE</td><td>start_time INCLUDE (movie_id, hall_id, price) – interogările de program pe interval de timp sunt acoperite de index.</td></tr><tr><td>IX_Screenings_Movie</td><td>NONCLUSTERED</td><td>Căutarea proiecțiilor unui film.</td></tr><tr><td>IX_Tickets_Customer</td><td>NONCLUSTERED filtrat</td><td>customer_id WHERE customer_id IS NOT NULL – istoricul biletelor unui client, fără intrările anonime de la casă.</td></tr><tr><td>IX_Employees_Manager</td><td>NONCLUSTERED</td><td>manager_id – parcurgerea ierarhiei (CTE recursiv).</td></tr><tr><td>UX_Customers_Phone</td><td>UNIQUE NONCLUSTERED filtrat</td><td>phone WHERE phone IS NOT NULL – telefon unic, dar permite mai mulți clienți fără telefon.</td></tr></tbody></table></div>
+
+<h2 id="views">6. Vederi</h2>
+<div class="tw"><table><thead><tr><th>Vedere</th><th>Descriere</th></tr></thead><tbody><tr><td><code>vw_UpcomingScreenings</code></td><td>Programul viitor: film, cinema, oraș, sală, oră, preț, capacitate și locuri libere (capacitate − bilete rezervate/plătite/folosite). JOIN pe 4 tabele + agregare.</td></tr><tr><td><code>vw_MovieCatalog</code></td><td>Catalogul de filme cu genurile concatenate (STRING_AGG peste relația m-n) și nota medie + numărul de recenzii ale clienților.</td></tr><tr><td><code>vw_CustomerTickets</code></td><td>Istoricul biletelor fiecărui client (film, cinema, sală, oră, loc, preț, status). JOIN pe 6 tabele.</td></tr><tr><td><code>vw_Revenue</code></td><td>Încasări și număr de bilete pe cinema și film (doar bilete PAID/USED). Agregare GROUP BY.</td></tr><tr><td><code>vw_EmployeeHierarchy</code></td><td>Ierarhia angajaților prin CTE recursiv (nivel + cale director &gt; manager &gt; angajat). Nu expune salariile.</td></tr><tr><td><code>vw_CustomerPublic</code></td><td>Profil client fără date sensibile (fără email, telefon, data nașterii) – pentru casier și analist.</td></tr></tbody></table></div>
+
+<h2 id="sec">7. Utilizatori, roluri și drepturi</h2>
+<p>Pentru fiecare tip de utilizator există un <b>login</b> (la nivel de server), un <b>user</b> în baza de date și apartenența la un <b>rol</b> căruia i se acordă drepturile. Drepturile se dau rolurilor, nu utilizatorilor, deci un utilizator nou primește drepturile prin simpla adăugare în rol. Principiul aplicat: <i>privilegiul minim</i> – accesul la date sensibile (salarii, date personale ale clienților) se face doar prin vederi sau coloane permise.</p>
+<div class="tw"><table><thead><tr><th>Rol</th><th>Login / user</th><th>Tip utilizator</th><th>Drepturi</th></tr></thead><tbody><tr><td><code>role_admin</code></td><td><code>cv_admin</code></td><td>Administrator</td><td>Membru db_owner: control total (DDL, DML, utilizatori, backup).</td></tr><tr><td><code>role_manager</code></td><td><code>cv_manager</code></td><td>Manager cinema</td><td>Citire pe toată schema dbo, cu excepția tabelei Employees (DENY); scriere pe Movies, Genres, MovieGenres, Screenings; UPDATE doar pe Tickets.status; ierarhia angajaților se vede prin vedere (fără salarii).</td></tr><tr><td><code>role_cashier</code></td><td><code>cv_cashier</code></td><td>Casier</td><td>Citire pe vederile de program/catalog/profil public; SELECT + INSERT pe Tickets și UPDATE doar pe Tickets.status; INSERT pe Customers și SELECT pe coloanele nesensibile; DELETE pe Tickets și Employees interzise.</td></tr><tr><td><code>role_customer</code></td><td><code>cv_webapp</code></td><td>Aplicația clienților (web/mobil)</td><td>Citire catalog, program, cinematografe, genuri, propriile bilete (vw_CustomerTickets); creare cont (INSERT Customers); cumpărare bilet (INSERT Tickets); recenzii (SELECT/INSERT/UPDATE Reviews). UPDATE/DELETE pe Tickets și Employees interzise.</td></tr><tr><td><code>role_analyst</code></td><td><code>cv_analyst</code></td><td>Analist</td><td>Doar SELECT pe vw_Revenue, vw_MovieCatalog, vw_UpcomingScreenings, vw_CustomerPublic. Accesul direct la Customers și Employees este interzis (DENY).</td></tr></tbody></table></div>
+<h3>Matricea drepturilor</h3>
+<div class="tw"><table class="mx"><thead><tr><th>Obiect</th><th>role_admin</th><th>role_manager</th><th>role_cashier</th><th>role_customer</th><th>role_analyst</th></tr></thead><tbody><tr><td><code>Cinemas</code></td><td class='all'>toate</td><td class='ok'>S</td><td class='none'>–</td><td class='ok'>S</td><td class='none'>–</td></tr><tr><td><code>Halls</code></td><td class='all'>toate</td><td class='ok'>S</td><td class='none'>–</td><td class='none'>–</td><td class='none'>–</td></tr><tr><td><code>Movies</code></td><td class='all'>toate</td><td class='ok'>S I U D</td><td class='none'>–</td><td class='none'>–</td><td class='none'>–</td></tr><tr><td><code>Genres</code></td><td class='all'>toate</td><td class='ok'>S I U D</td><td class='none'>–</td><td class='ok'>S</td><td class='none'>–</td></tr><tr><td><code>MovieGenres</code></td><td class='all'>toate</td><td class='ok'>S I U D</td><td class='none'>–</td><td class='none'>–</td><td class='none'>–</td></tr><tr><td><code>Screenings</code></td><td class='all'>toate</td><td class='ok'>S I U D</td><td class='none'>–</td><td class='none'>–</td><td class='none'>–</td></tr><tr><td><code>Customers</code></td><td class='all'>toate</td><td class='ok'>S</td><td class='ok'>I + S(coloane nesensibile)</td><td class='ok'>I</td><td class='none'>–</td></tr><tr><td><code>Tickets</code></td><td class='all'>toate</td><td class='ok'>S, U(status)</td><td class='ok'>S I U(status)</td><td class='ok'>I</td><td class='none'>–</td></tr><tr><td><code>Reviews</code></td><td class='all'>toate</td><td class='ok'>S</td><td class='none'>–</td><td class='ok'>S I U</td><td class='none'>–</td></tr><tr><td><code>Employees</code></td><td class='all'>toate</td><td class='no'>✗</td><td class='no'>✗</td><td class='no'>✗</td><td class='no'>✗</td></tr><tr><td><code>vw_UpcomingScreenings</code></td><td class='all'>toate</td><td class='ok'>S</td><td class='ok'>S</td><td class='ok'>S</td><td class='ok'>S</td></tr><tr><td><code>vw_MovieCatalog</code></td><td class='all'>toate</td><td class='ok'>S</td><td class='ok'>S</td><td class='ok'>S</td><td class='ok'>S</td></tr><tr><td><code>vw_CustomerTickets</code></td><td class='all'>toate</td><td class='ok'>S</td><td class='none'>–</td><td class='ok'>S</td><td class='none'>–</td></tr><tr><td><code>vw_Revenue</code></td><td class='all'>toate</td><td class='ok'>S</td><td class='none'>–</td><td class='none'>–</td><td class='ok'>S</td></tr><tr><td><code>vw_EmployeeHierarchy</code></td><td class='all'>toate</td><td class='ok'>S</td><td class='none'>–</td><td class='none'>–</td><td class='none'>–</td></tr><tr><td><code>vw_CustomerPublic</code></td><td class='all'>toate</td><td class='ok'>S</td><td class='ok'>S</td><td class='none'>–</td><td class='ok'>S</td></tr></tbody></table></div><p class='note'>S = SELECT, I = INSERT, U = UPDATE, D = DELETE, ✗ = DENY explicit, – = niciun drept. Dreptul de SELECT pe schema dbo pentru role_manager este acordat global, apoi restricționat prin DENY pe Employees (DENY are prioritate față de GRANT).</p>
+<h3>Testare (EXECUTE AS)</h3>
+<p>Scriptul <code>04_security.sql</code> verifică drepturile: casierul și managerul primesc eroarea <i>SELECT permission was denied on the object 'Employees'</i>, analistul primește <i>DELETE permission was denied on the object 'Tickets'</i>, iar casierul vede programul prin <code>vw_UpcomingScreenings</code>.</p>
+
+<h2 id="run">8. Scripturi și ordinea de rulare</h2>
+<div class="tw"><table><thead><tr><th>Script</th><th>Conținut</th></tr></thead><tbody><tr><td><code>01_create_database.sql</code></td><td>Creează (și recreează) baza CinemaVerse: tabele, constrângeri, indecși.</td></tr><tr><td><code>02_seed_data.sql</code></td><td>Date de test: 4 cinematografe, 8 săli, 10 filme, 12 proiecții, 8 clienți, 18 bilete, 10 recenzii, 8 angajați.</td></tr><tr><td><code>03_views.sql</code></td><td>Cele 6 vederi + interogări de verificare.</td></tr><tr><td><code>04_security.sql</code></td><td>Login-uri, utilizatori, roluri, drepturi + teste EXECUTE AS.</td></tr></tbody></table></div>
+<p>Se rulează în ordine, ca sysadmin, în SQL Server Management Studio. Scripturile 01–03 se pot rula repetat (01 recreează baza de date).</p>
+
+<h2 id="next">9. Etapa următoare (prezentarea finală, 10–17 ianuarie)</h2>
+<ul class="sp"><li>Proceduri stocate CRUD (vânzare bilet, anulare, programare proiecție etc.) și funcții Transact-SQL (locuri libere, preț cu reducere, vârstă client).</li>
+<li>Triggere DML (validarea locului față de capacitatea sălii, puncte de loialitate, audit prețuri) și triggere DDL (blocarea DROP/ALTER TABLE, jurnal modificări schemă).</li>
+<li>Cursoare (raport pe cinematografe, acordare puncte de loialitate).</li>
+<li>Job-uri Transact-SQL (backup periodic, curățare rezervări expirate) și strategie backup/restore (full + differential + log).</li></ul>
+<footer>CinemaVerse · Proiect ABD · Paucean Ioana</footer>
+</main></body></html>
